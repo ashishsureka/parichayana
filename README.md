@@ -11,4 +11,4 @@ sourceFolder: application to be mined
 
 destinationFile: output text file (report)
 
-Example on Windows: java CatchAntiPatterns C:\\RESEARCH\\ExceptionHandling\\Activiti-master C:\\RESEARCH\\ExceptionHandling\\output.txt
+Example on Windows: java CatchAntiPatterns C:\\\RESEARCH\\\ExceptionHandling\\\Activiti-master C:\\\RESEARCH\\\ExceptionHandling\\\output.txt
