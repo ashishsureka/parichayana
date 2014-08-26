@@ -13,6 +13,7 @@ import java.io.*;
 public class CatchClauseVisitor extends ASTVisitor {
 
 	public int catchall = 0;
+	public int catchnpe = 0;
 	public int returnnull = 0;
 	public int numcatchclause = 0;
 	public int nummethoddecl = 0;
@@ -25,12 +26,20 @@ public class CatchClauseVisitor extends ASTVisitor {
 	public int numthrowsexception = 0;
 	public int numdestwrap = 0;
 	public int numreplyingcause = 0;
+	public int numInterruptedException=0;
+	public int numLogFatal = 0;
+	public int numtnpe = 0;
+	
 	public File f;
 	public PrintWriter writer = null;
 	public int linenumber = 1; 
 	
 	public void setLinenumber(int linenumber){
 		this.linenumber = linenumber;
+	}
+	
+	public int getNumLogFatal(){
+		return numLogFatal;
 	}
 	
 	public int getLinenumber(){
@@ -43,6 +52,10 @@ public class CatchClauseVisitor extends ASTVisitor {
 	
 	public void setFile(File f){
 		this.f = f;
+	}
+	
+	public int getNumInterrptedException(){
+		return numInterruptedException;
 	}
 	
 	public int getNumrelyingcause(){
@@ -89,10 +102,17 @@ public class CatchClauseVisitor extends ASTVisitor {
 		return numthrowlog;
 	}
 	
+	public int getNumtnpe(){
+		return numtnpe;
+	}
+	
 	public int getNumcatchall(){
 		return catchall;
 	}
 	
+	public int getNumcatchnpe(){
+		return catchnpe; 
+	}
 	
 	public boolean visit(CatchClause node){
 	    //System.out.println("CATCH CLAUSE : " + node.toString());
@@ -138,6 +158,10 @@ public class CatchClauseVisitor extends ASTVisitor {
 		    (body.contains(new StringBuffer("log.info"))) ||
 		    (body.contains(new StringBuffer("log.warn"))) ||
 		    (body.contains(new StringBuffer("log.debug"))) ||
+		    (body.contains(new StringBuffer("log.trace"))) ||
+		    (body.contains(new StringBuffer("log.fatal"))) ||
+		    (body.contains(new StringBuffer("logger.trace"))) ||
+		    (body.contains(new StringBuffer("logger.fatal"))) ||
 		    (body.contains(new StringBuffer("logger.error"))) ||
 		    (body.contains(new StringBuffer("logger.info"))) ||
 		    (body.contains(new StringBuffer("logger.warn"))) ||
@@ -163,12 +187,35 @@ public class CatchClauseVisitor extends ASTVisitor {
 			numthrowlog++;
 			
 		}
-	    ///////////////////////////////////////////////////////////////
-	    
+	    /////////////////LOG FATAL/////////////////////////////////////
+		List<Statement> lis = node.getBody().statements();
+		int lssize = lis.size();		
+		if(lssize==1){
+			if( (body.contains(new StringBuffer("log.fatal"))) ||
+				(body.contains(new StringBuffer("logger.fatal"))) ) {
+					System.out.println("LOG FATAL");
+					numLogFatal++;
+					System.out.println("_________________________________________________________________________________");
+			    	System.out.println("FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+					System.out.println("CATCH CLAUSE : " + node);
+			    	System.out.println("ANTI-PATTERN LGFT : Fatal condition, log.fatal is the only line of code in the catch clause – method should abort and notify the caller with an exception");
+			    	System.out.println("_________________________________________________________________________________");
+			    	//writer.println("_________________________________________________________________________________");
+			    	writer.println(linenumber + " FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+					linenumber++;
+			    	writer.println(linenumber + " CATCH CLAUSE : " + node);
+			    	linenumber++;
+			    	writer.println(linenumber + " ANTI-PATTERN LGFT : Fatal condition, log.fatal is the only line of code in the catch clause – method should abort and notify the caller with an exception");
+			    	linenumber++;
+			    	writer.println("_________________________________________________________________________________");
+			}
+		}		
+		/////////////////////////////////////////////////////////////////
+		
 		
 		//////////////////////DESTRUCTIVE WRAPPING/////////////////////
-		List<Statement> lis = node.getBody().statements();
-		int lssize = lis.size();
+		lis = node.getBody().statements();
+		lssize = lis.size();
 		for(int i=0;i<lssize;i++){
 			Statement s = (Statement)lis.get(i);
 			String content = s.toString();
@@ -259,6 +306,10 @@ public class CatchClauseVisitor extends ASTVisitor {
 				(content.contains(new StringBuffer("log.info"))) ||
 				(content.contains(new StringBuffer("log.warn"))) ||
 				(content.contains(new StringBuffer("log.debug"))) ||
+				(content.contains(new StringBuffer("log.trace"))) ||
+				(content.contains(new StringBuffer("log.fatal"))) ||
+				(content.contains(new StringBuffer("logger.trace"))) ||
+				(content.contains(new StringBuffer("logger.fatal"))) ||
 				(content.contains(new StringBuffer("logger.error"))) ||
 				(content.contains(new StringBuffer("logger.info"))) ||
 				(content.contains(new StringBuffer("logger.warn"))) ||
@@ -284,26 +335,85 @@ public class CatchClauseVisitor extends ASTVisitor {
 		}
 		//////////////////////////////////////////////////////////////
 		
-	    
+	    //////////////////////////////////////////////////////////////
+		
+		///////////////INTERRUPTED EXCEPTION//////////////////////////
+		String nodeType = node.getException().getType().toString();
+		boolean emptyStatement = true;
+	    if(nodeType.equalsIgnoreCase("InterruptedException")){
+	    	List<Statement> lst = node.getBody().statements();
+			for(int i=0; i<lst.size(); i++){
+				Statement s = (Statement)lst.get(i);
+				String content = s.toString().trim();
+				if(!(content.equalsIgnoreCase(""))){
+					emptyStatement = false;
+				}
+			}
+			if(emptyStatement){
+				numInterruptedException++;
+				//System.out.println("INTERRUPTED EXCEPTION : " + node);
+				System.out.println("_________________________________________________________________________________");
+		    	System.out.println("FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+		    	System.out.println("CATCH CLAUSE : " + node);
+		    	System.out.println("ANTI-PATTERN INEE : Ignoring or suppressing InterruptedException with an empty catch-clause is an anti-pattern, empty catch block prevents in determining that an interrupted exception occurred or knowing that the thread was interrupted");
+		    	System.out.println("_________________________________________________________________________________");
+		    	//writer.println("_________________________________________________________________________________");
+		    	writer.println(linenumber + " FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+		    	linenumber++;
+		    	writer.println(linenumber + " CATCH CLAUSE : " + node);
+		    	linenumber++;
+		    	writer.println(linenumber + " ANTI-PATTERN INEE : Ignoring or suppressing InterruptedException with an empty catch-clause is an anti-pattern, empty catch block prevents in determining that an interrupted exception occurred or knowing that the thread was interrupted");
+		    	linenumber++;
+		    	writer.println("_________________________________________________________________________________");
+		    
+			}
+	    }
+		
 	    ///////////////////CATCH ALL///////////////////////////////////
-	    String nodeType = node.getException().getType().toString();
-	    if(nodeType.equalsIgnoreCase("Exception")){
-	    	catchall++;
+	    nodeType = node.getException().getType().toString();
+	    if( (nodeType.equalsIgnoreCase("Exception")) || (nodeType.equalsIgnoreCase("Throwable")) ){
+	    	List<Statement> lstate = node.getBody().statements();
+            int lstatesize = lstate.size();
+			Statement laststatement = (Statement)lstate.get(lstatesize-1);
+			if(!(laststatement.toString().contains(new StringBuffer("throw")))){
+				catchall++;
+		    	System.out.println("_________________________________________________________________________________");
+		    	System.out.println("FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+		    	System.out.println("CATCH CLAUSE : " + node);
+		    	System.out.println("ANTI-PATTERN CTGE : catching generic Exception, catch the specific exception that can be thrown");
+		    	System.out.println("_________________________________________________________________________________");
+		    	//writer.println("_________________________________________________________________________________");
+		    	writer.println(linenumber + " FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+		    	linenumber++;
+		    	writer.println(linenumber + " CATCH CLAUSE : " + node);
+		    	linenumber++;
+		    	writer.println(linenumber + " ANTI-PATTERN CTGE : catching generic Exception, catch the specific exception that can be thrown");
+		    	linenumber++;
+		    	writer.println("_________________________________________________________________________________");
+			}
+	    }
+	    ///////////////////////////////////////////////////////////////
+	    
+	    ///////////////////CATCH NULL POINTER EXCEPTION///////////////////////////////////
+	    nodeType = node.getException().getType().toString();
+	    if( (nodeType.equalsIgnoreCase("NullPointerException"))) {
+	    	catchnpe++;
 	    	System.out.println("_________________________________________________________________________________");
 	    	System.out.println("FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
 	    	System.out.println("CATCH CLAUSE : " + node);
-	    	System.out.println("ANTI-PATTERN CTGE : catching generic Exception, catch the specific exception that can be thrown");
+	    	System.out.println("ANTI-PATTERN CNPE : NullPointerException is a logical or programming error in the code (result of a bug) and should be eliminated rather than catching");
 	    	System.out.println("_________________________________________________________________________________");
 	    	//writer.println("_________________________________________________________________________________");
 	    	writer.println(linenumber + " FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
 	    	linenumber++;
 	    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 	    	linenumber++;
-	    	writer.println(linenumber + " ANTI-PATTERN CTGE : catching generic Exception, catch the specific exception that can be thrown");
+	    	writer.println(linenumber + " ANTI-PATTERN CNPE : NullPointerException is a logical or programming error in the code (result of a bug) and should be eliminated rather than catching. ");
 	    	linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 	    }
-	    ///////////////////////////////////////////////////////////////
+	  ///////////////////////////////////////////////////////////////
+
 	    
 	    
         ///////////////////LOG AND RETURN NULL, PRINTSTACKTRACE AND RETURN NULL///////////////////////////////////
@@ -354,9 +464,26 @@ public class CatchClauseVisitor extends ASTVisitor {
 	}
 	
 	public boolean visit(ThrowStatement node){
-		//System.out.println("THROW CLAUSE : " + node.toString());
-		//System.out.println("THROW CLAUSE : " + node.getExpression());
+		////////////////////////////THROWS NULL-POINTER-EXCEPTION/////////////////////////////////////////////
+		if(node.getExpression().toString().contains("NullPointerException")){
+			//System.out.println("THROW CLAUSE : " + node.getExpression());
+			System.out.println("_________________________________________________________________________________");
+	    	System.out.println("FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+	    	System.out.println("THROW CLAUSE : " + node);
+			System.out.println("ANTI-PATTERN TNPE : NullPointerException should not be thrown by the program as it is expected that it is thrown by the virtual machine");
+			System.out.println("_________________________________________________________________________________");
+			//writer.println("_________________________________________________________________________________");
+	    	writer.println(linenumber + " FILE NAME : " + f.getAbsolutePath().substring(30, f.getAbsolutePath().length()) + "\n");
+	    	linenumber++;
+	    	writer.println(linenumber + " THROW CLAUSE : " + node);
+			linenumber++;
+	    	writer.println(linenumber + "ANTI-PATTERN TNPE : NullPointerException should not be thrown by the program as it is expected that it is thrown by the virtual machine");
+			linenumber++;
+	    	writer.println("_________________________________________________________________________________");
+			numtnpe++;
+		}
 		return true;
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 
 	

@@ -19,8 +19,8 @@ public class CatchAntiPatterns {
 	public File f1 = null;
 	public static PrintWriter writer = null;
 	public static int linenumber = 1;
-	public static String destinationFile = "C:\\RESEARCH\\ExceptionHandling\\output.txt";
-	public static String sourceFolder = "C:\\RESEARCH\\ExceptionHandling\\Activiti-master";
+	public static String destinationFile = "C:\\RESEARCH\\ExceptionHandling\\OUTPUT\\output.txt";
+	public static String sourceFolder = "C:\\RESEARCH\\ExceptionHandling\\";
 	
 	public void listFilesInDirectory(File dir) {
 		File[] files = dir.listFiles();
@@ -103,7 +103,7 @@ public class CatchAntiPatterns {
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\JFreeChart");
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\JUnit");
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\apache-tomcat-8.0.8-src");
-			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\apache-jmeter-2.11");
+			File dire = new File("C:\\RESEARCH\\ExceptionHandling\\apache-jmeter-2.11");
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\h2");
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\k-9-4-804");
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\JSON-java-master");
@@ -113,7 +113,7 @@ public class CatchAntiPatterns {
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\play-authenticate-master");
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\jOOQ-master");
 			//File dire = new File("C:\\RESEARCH\\ExceptionHandling\\spring-data-neo4j-master");
-			File dire = new File(sourceFolder);
+			//File dire = new File(sourceFolder);
 			
 			cap.listFilesInDirectory(dire);
 			int numcatchclause = ccv.getNumcatchclause();
@@ -133,6 +133,10 @@ public class CatchAntiPatterns {
 			System.out.println("NUMBER OF THROWS EXCEPTION ANTIPATTERN : " + ccv.getNumthrowsexception());
 			System.out.println("NUMBER OF DESTRUCTIVE WRAPPING ANTIPATTERN : " + ccv.getNumdestwrap());
 			System.out.println("NUMBER OF RELYING ON GETCAUSE ANTIPATTERN : " + ccv.getNumrelyingcause());
+			System.out.println("NUMBER OF EMPTY CATCH INTERRUPTED EXCEPTION : " + ccv.getNumInterrptedException());
+			System.out.println("NUMBER OF LOG FATAL EXCEPTION : " + ccv.getNumLogFatal());
+			System.out.println("NUMBER OF CATCH NULL POINTER EXCEPTION : " + ccv.getNumcatchnpe());
+			System.out.println("NUMBER OF THROW NULL POINTER EXCEPTION : " + ccv.getNumtnpe());
 			
 			writer.println("\n\n" + linenumber + " EXPERIMENTAL RESULTS");
 			linenumber++;
@@ -149,13 +153,13 @@ public class CatchAntiPatterns {
 			linenumber++;
 			writer.println(linenumber + " NUMBER OF CTGE ANTIPATTERN : " + ccv.getNumcatchall());
 			linenumber++;
-			writer.println(linenumber + " NUMBER OF RNHR ANTIPATTERN : " + ccv.getNumlogreturnnull());
+			writer.println(linenumber + " NUMBER OF LGRN ANTIPATTERN : " + ccv.getNumlogreturnnull());
 			linenumber++;
 			writer.println(linenumber + " NUMBER OF PSRN ANTIPATTERN : " + ccv.getNumprintstackreturnnull());
 			linenumber++;
 			writer.println(linenumber + " NUMBER OF MLLM ANTIPATTERN : " + ccv.getNummultilinelog());
 			linenumber++;
-			writer.println(linenumber + " NUMBER OF LGRN ANTIPATTERN : " + ccv.getNumcatchignore());
+			writer.println(linenumber + " NUMBER OF RNHR ANTIPATTERN : " + ccv.getNumcatchignore());
 			linenumber++;
 			writer.println(linenumber + " NUMBER OF THGE ANTIPATTERN : " + ccv.getNumthrowsexception());
 			linenumber++;
@@ -163,6 +167,15 @@ public class CatchAntiPatterns {
 			linenumber++;
 			writer.println(linenumber + " NUMBER OF RRGC ANTIPATTERN : " + ccv.getNumrelyingcause());
 			linenumber++;
+			writer.println(linenumber + " NUMBER OF INEE ANTIPATTERN : " + ccv.getNumInterrptedException());
+			linenumber++;
+			writer.println(linenumber + " NUMBER OF LGFT ANTIPATTERN : " + ccv.getNumLogFatal());
+			linenumber++;
+			writer.println(linenumber + " NUMBER OF CNPE ANTIPATTERN : " + ccv.getNumcatchnpe());
+			linenumber++;
+			writer.println(linenumber + " NUMBER OF TNPE ANTIPATTERN : " + ccv.getNumtnpe());
+			linenumber++;
+			
 			writer.close();
 		}catch(Exception e){
 			System.out.println("EXCEPTION " + e);
