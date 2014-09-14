@@ -12,8 +12,6 @@ package in.software.analytics.parichayana.core;
 
 import java.io.File;
 
-import org.eclipse.core.internal.runtime.InternalPlatform;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -71,16 +69,19 @@ public class ParichayanaActivator extends AbstractUIPlugin {
 	}
 	
 	public static void logInfo(String message) {
-		plugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+		if (plugin.isDebugging()) {
+			plugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+		}
 	}
 
 	public static File getDestinationFile(String projectName) {
 		Bundle bundle = Platform.getBundle(PLUGIN_ID);
-		IPath location = InternalPlatform.getDefault().getStateLocation(bundle, true);
+		IPath location = Platform.getStateLocation(bundle);
 		File root = location.toFile();
 		File projectFile = new File(root, projectName);
 		projectFile.mkdirs();
 		File file = new File(projectFile, "parichyana.txt");
 		return file;
 	}
+
 }

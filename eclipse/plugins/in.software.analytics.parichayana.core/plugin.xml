@@ -42,5 +42,117 @@
 	<super type="org.eclipse.core.resources.textmarker"/>
 	<persistent value="true"/>
   </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.pste"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana PSTE">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+ 
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.lgte"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana LGTE">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
     
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.ctge"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana CTGE">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.lgrn"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana LGRN">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.psrn"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana PSRN">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.mllm"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana MLLM">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.rnhr"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana RNHR">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.thge"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana THGE">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.wepg"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana WEPG">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.rrgc"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana RRGC">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.inee"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana INEE">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.lgft"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana LGFT">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.cnpe"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana CNPE">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem.tnpe"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana TNPE">
+	<super type="in.software.analytics.parichayana.core.problem"/>
+	<persistent value="true"/>
+  </extension>
+  
 </plugin>

@@ -184,7 +184,7 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 			return;
 		}
 		try {
-			resource.deleteMarkers(Constants.BASE_MARKER_ID, false,
+			resource.deleteMarkers(Constants.BASE_MARKER_ID, true,
 					IResource.DEPTH_INFINITE);
 		} catch (CoreException e) {
 			ParichayanaActivator.log(e);
