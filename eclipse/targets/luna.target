@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?><target includeMode="feature" name="kepler" sequenceNumber="63">
+<locations>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.equinox.executable.feature.group" version="3.6.100.v20140603-1326"/>
+<unit id="org.eclipse.jdt.source.feature.group" version="3.10.0.v20140606-1536"/>
+<unit id="org.eclipse.sdk.feature.group" version="4.4.0.v20140606-1558"/>
+<unit id="org.eclipse.rcp.sdk.id" version="4.4.0.I20140606-1215"/>
+<unit id="org.eclipse.sdk.ide" version="4.4.0.I20140606-1215"/>
+<unit id="org.eclipse.jdt.feature.group" version="3.10.0.v20140606-1536"/>
+<unit id="org.eclipse.core.runtime.feature.feature.group" version="1.1.1.v20140606-1445"/>
+<unit id="org.eclipse.rcp.source.feature.group" version="4.4.0.v20140606-1445"/>
+<unit id="org.eclipse.platform.feature.group" version="4.4.0.v20140606-1558"/>
+<unit id="org.eclipse.rcp.configuration.feature.group" version="1.0.1.v20140603-1608"/>
+<unit id="org.eclipse.e4.rcp.source.feature.group" version="1.3.100.v20140606-1445"/>
+<unit id="org.eclipse.equinox.p2.user.ui.source.feature.group" version="2.2.0.v20140523-0116"/>
+<unit id="epp.package.standard" version="4.4.0.20140612-0500"/>
+<unit id="org.eclipse.e4.rcp.feature.group" version="1.3.100.v20140606-1445"/>
+<unit id="epp.package.java" version="4.4.0.20140612-0500"/>
+<unit id="org.eclipse.platform.source.feature.group" version="4.4.0.v20140606-1558"/>
+<unit id="org.eclipse.pde.source.feature.group" version="3.10.0.v20140606-1215"/>
+<unit id="org.eclipse.rcp.feature.group" version="4.4.0.v20140606-1445"/>
+<unit id="org.eclipse.platform.sdk" version="4.4.0.I20140606-1215"/>
+<unit id="org.eclipse.pde.feature.group" version="3.10.0.v20140606-1215"/>
+<repository location="http://download.eclipse.org/releases/luna"/>
+</location>
+</locations>
+</target>

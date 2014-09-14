@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description>
+      Parichayana Update Site
+   </description>
+   <feature url="features/in.software.analytics.parichayana.feature_0.0.0.jar" id="in.software.analytics.parichayana.feature" version="0.0.0">
+      <category name="Parichayana Update Site"/>
+   </feature>
+   <feature url="features/in.software.analytics.parichayana.feature.source_0.0.0.jar" id="in.software.analytics.parichayana.feature.source" version="0.0.0">
+      <category name="Parichayana Update Site"/>
+   </feature>
+   <category-def name="Parichayana Update Site" label="Parichayana ">
+      <description>
+         Parichayana Update Site
+      </description>
+   </category-def>
+</site>
