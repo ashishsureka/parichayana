@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+  <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="in.software.analytics.parichayana.core.internal.preferences.ParichayanaPreferencesInitializer"/>
+ </extension>
+ 
+  <extension
+       id="parichayanaNature"
+       name="Parichayana"
+       point="org.eclipse.core.resources.natures">
+    <runtime>
+       <run
+          class="in.software.analytics.parichayana.core.internal.nature.ParichayanaNature">
+       </run>
+    </runtime>
+    <requires-nature
+          id="org.eclipse.jdt.core.javanature">
+    </requires-nature>
+    <builder
+          id="in.software.analytics.parichayana.core.parichayanaBuilder">
+    </builder>
+    </extension>
+    
+    <extension 
+		point="org.eclipse.core.resources.builders" 
+		id="parichayanaBuilder"
+		name="Parichayana Builder">
+	<builder>
+		<run class="in.software.analytics.parichayana.core.internal.builder.ParichayanaBuilder">
+		</run>
+	</builder>
+  </extension>
+  
+  <extension 
+  		id="in.software.analytics.parichayana.core.problem"
+  		point="org.eclipse.core.resources.markers"
+  		name="Parichayana Problem">
+	<super type="org.eclipse.core.resources.problemmarker"/>
+	<super type="org.eclipse.core.resources.textmarker"/>
+	<persistent value="true"/>
+  </extension>
+    
+</plugin>

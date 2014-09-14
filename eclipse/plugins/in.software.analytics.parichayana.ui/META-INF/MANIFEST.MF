@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Parichayana UI
+Bundle-SymbolicName: in.software.analytics.parichayana.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: in.software.analytics.parichayana.ui.ParichayanaUIActivator
+Bundle-Vendor: Software Analytics at IIIT-Delhi
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ in.software.analytics.parichayana.core,
+ org.eclipse.core.commands,
+ org.eclipse.core.filesystem,
+ org.eclipse.ui.workbench,
+ org.eclipse.ui.ide
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy

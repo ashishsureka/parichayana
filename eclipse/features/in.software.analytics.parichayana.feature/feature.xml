@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="in.software.analytics.parichayana.feature"
+      label="Parichayana"
+      version="1.0.0.qualifier"
+      provider-name="Software Analytics at IIIT-Delhi"
+      plugin="in.software.analytics.parichayana.core">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <plugin
+         id="in.software.analytics.parichayana.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="in.software.analytics.parichayana.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
