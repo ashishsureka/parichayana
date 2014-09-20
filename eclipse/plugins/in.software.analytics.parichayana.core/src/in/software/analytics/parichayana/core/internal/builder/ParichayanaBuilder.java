@@ -162,7 +162,8 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 	 * @param monitor 
 	 */
 	private void build(List<ICompilationUnit> units, IProgressMonitor monitor) {
-		new CatchAntiPatterns(units, project.getProject().getName());
+		monitor.beginTask("Parichayana builder", units.size());
+		new CatchAntiPatterns(units, project.getProject().getName(), monitor);
 	}
 
 	/**

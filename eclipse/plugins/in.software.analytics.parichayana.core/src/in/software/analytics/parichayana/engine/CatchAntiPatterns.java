@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -27,7 +28,7 @@ public class CatchAntiPatterns {
 	public int linenumber = 1;
 	public File destinationFile;
 	
-	public CatchAntiPatterns(List<ICompilationUnit> units, String projectName) {
+	public CatchAntiPatterns(List<ICompilationUnit> units, String projectName, IProgressMonitor monitor) {
 		destinationFile = ParichayanaActivator.getDestinationFile(projectName);
 		
 		ParichayanaActivator.logInfo("Mining Source Code for Automatically Discovering Exception Management Anti-Patterns and Code Smell\n");
@@ -44,7 +45,7 @@ public class CatchAntiPatterns {
 			ccv.setWriter(writer);
 			ccv.setLinenumber(linenumber);
 			
-			process(units);
+			process(units, monitor);
 			int numcatchclause = ccv.getNumcatchclause();
 			linenumber = ccv.getLinenumber();
 			ParichayanaActivator.logInfo("\n\nEXPERIMENTAL RESULTS");
@@ -112,9 +113,14 @@ public class CatchAntiPatterns {
 
 	}
 	
-	public void process(List<ICompilationUnit> units) {
+	public void process(List<ICompilationUnit> units, IProgressMonitor monitor) {
+		int size = units.size();
 		for (ICompilationUnit unit:units) {
 			fileCounter++;
+			if (monitor != null) {
+				monitor.subTask("Analyzing " + unit.getElementName() + " (" + fileCounter + "/" + size + ")" );
+				monitor.worked(1);
+			}
 			ccv.setCompilationUnit(unit);
 			process(unit);
 		}
