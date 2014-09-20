@@ -96,4 +96,28 @@
          </command>
       </menuContribution>
   </extension>
+  
+  <extension
+         point="org.eclipse.ui.propertyPages">
+       <page
+            name="Parichayana"
+            class="in.software.analytics.parichayana.ui.internal.preferences.ParichayanaPreferencePage"
+            id="in.software.analytics.parichayana.parichayanaPropertyPage">
+         <enabledWhen>
+		     	<adapt type="org.eclipse.core.resources.IProject">
+		     		<test property="org.eclipse.core.resources.projectNature"
+		     		   value="in.software.analytics.parichayana.core.parichayanaNature"/>
+				</adapt>
+         </enabledWhen>
+      </page>
+   </extension>
+   
+   <extension point="org.eclipse.ui.preferencePages">
+      <page 
+         class="in.software.analytics.parichayana.ui.internal.preferences.ParichayanaPreferencePage" 
+         id="in.software.analytics.parichayana.parichayanaPreferencePage" 
+         name="Parichayana">
+      </page>
+   </extension>
+   
 </plugin>

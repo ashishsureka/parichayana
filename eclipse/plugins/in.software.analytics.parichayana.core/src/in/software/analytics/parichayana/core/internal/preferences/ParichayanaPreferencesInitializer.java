@@ -10,7 +10,13 @@
  *******************************************************************************/
 package in.software.analytics.parichayana.core.internal.preferences;
 
+import in.software.analytics.parichayana.core.Constants;
+import in.software.analytics.parichayana.core.ParichayanaActivator;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jdt.core.JavaCore;
 
 public class ParichayanaPreferencesInitializer extends
 		AbstractPreferenceInitializer {
@@ -20,8 +26,23 @@ public class ParichayanaPreferencesInitializer extends
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		// TODO Auto-generated method stub
-
+		IEclipsePreferences preferences = DefaultScope.INSTANCE.getNode(ParichayanaActivator.PLUGIN_ID);
+		preferences.putBoolean(Constants.ENABLE_PARICHAYANA, true);
+		preferences.put(Constants.TEST_PSTE, JavaCore.WARNING);
+		preferences.put(Constants.TEST_LGTE, JavaCore.WARNING);
+		preferences.put(Constants.TEST_LGRN, JavaCore.WARNING);
+		preferences.put(Constants.TEST_PSRN, JavaCore.WARNING);
+		preferences.put(Constants.TEST_MLLM, JavaCore.WARNING);
+		preferences.put(Constants.TEST_RNHR, JavaCore.WARNING);
+		preferences.put(Constants.TEST_THGE, JavaCore.WARNING);
+		preferences.put(Constants.TEST_WEPG, JavaCore.WARNING);
+		preferences.put(Constants.TEST_RRGC, JavaCore.WARNING);
+		preferences.put(Constants.TEST_INEE, JavaCore.WARNING);
+		preferences.put(Constants.TEST_LGFT, JavaCore.WARNING);
+		preferences.put(Constants.TEST_CNPE, JavaCore.WARNING);
+		preferences.put(Constants.TEST_TNPE, JavaCore.WARNING);
+		preferences.put(Constants.TEST_CTGE, JavaCore.WARNING);
+		
 	}
 
 }

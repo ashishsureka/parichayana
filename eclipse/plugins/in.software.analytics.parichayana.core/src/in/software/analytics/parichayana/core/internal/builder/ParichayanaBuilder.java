@@ -64,7 +64,7 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 		if (project == null || !project.isAccessible()) {
 			return ZERO_PROJECT;
 		}
-		if (!project.hasNature(ParichayanaNature.NATURE_ID)) {
+		if (!project.hasNature(ParichayanaNature.NATURE_ID) || !ParichayanaActivator.isParichayanaEnabled(project)) {
 			cleanupMarkers(project);
 			return ZERO_PROJECT;
 		}
@@ -163,7 +163,7 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 	 */
 	private void build(List<ICompilationUnit> units, IProgressMonitor monitor) {
 		monitor.beginTask("Parichayana builder", units.size());
-		new CatchAntiPatterns(units, project.getProject().getName(), monitor);
+		new CatchAntiPatterns(units, project, monitor);
 	}
 
 	/**
@@ -266,6 +266,7 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 							ICompilationUnit[] cus = packageFragment
 									.getCompilationUnits();
 							for (ICompilationUnit cu : cus) {
+								cleanupMarkers(cu.getUnderlyingResource());
 								compilationUnits.add(cu);
 							}
 						}

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -27,8 +28,11 @@ public class CatchAntiPatterns {
 	public PrintWriter writer = null;
 	public int linenumber = 1;
 	public File destinationFile;
+	private IProject project;
 	
-	public CatchAntiPatterns(List<ICompilationUnit> units, String projectName, IProgressMonitor monitor) {
+	public CatchAntiPatterns(List<ICompilationUnit> units, IProject project, IProgressMonitor monitor) {
+		this.project = project;
+		String projectName = project.getName();
 		destinationFile = ParichayanaActivator.getDestinationFile(projectName);
 		
 		ParichayanaActivator.logInfo("Mining Source Code for Automatically Discovering Exception Management Anti-Patterns and Code Smell\n");
@@ -128,7 +132,7 @@ public class CatchAntiPatterns {
 	
 	public void initialize(){
 		parser = ASTParser.newParser(AST.JLS3);
-		ccv = new CatchClauseVisitor();
+		ccv = new CatchClauseVisitor(project);
 	}
 	
 	public void process(ICompilationUnit unit){

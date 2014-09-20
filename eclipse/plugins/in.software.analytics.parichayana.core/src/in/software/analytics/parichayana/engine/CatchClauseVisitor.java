@@ -15,8 +15,10 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -30,23 +32,6 @@ import org.eclipse.jdt.core.dom.TryStatement;
 
 public class CatchClauseVisitor extends ASTVisitor {
 
-	/**
-	 * 
-	 */
-	private static final String ANTI_PATTERN_TNPE_MESSAGE = "ANTI-PATTERN TNPE : NullPointerException should not be thrown by the program as it is expected that it is thrown by the virtual machine";
-	private static final String ANTI_PATTERN_CNPE_MESSAGE = "ANTI-PATTERN CNPE : NullPointerException is a logical or programming error in the code (result of a bug) and should be eliminated rather than catching";
-	private static final String ANTI_PATTERN_LGFT_MESSAGE = "ANTI-PATTERN LGFT : Fatal condition, log.fatal is the only line of code in the catch clause � method should abort and notify the caller with an exception";
-	private static final String ANTI_PATTERN_INEE_MESSAGE = "ANTI-PATTERN INEE : Ignoring or suppressing InterruptedException with an empty catch-clause is an anti-pattern, empty catch block prevents in determining that an interrupted exception occurred or knowing that the thread was interrupted";
-	private static final String ANTI_PATTERN_RRGC_MESSAGE = "ANTI-PATTERN RRGC : relying on the result of getCause makes the code fragile, use org.apache.commons.lang.exception.ExceptionUtils.getRootCause(Throwable throwable)";
-	private static final String ANTI_PATTERN_WEPG_MESSAGE = "ANTI-PATTERN WEPG : Wrapping the exception and passing getMessage() destroys the stack trace of original exception";
-	private static final String ANTI_PATTERN_THGE_MESSAGE = "ANTI-PATTERN THGE : Throws generic Exception, defeats the purpose of using a checked exception, declare the specific checked exceptions that your method can throw";
-	private static final String ANTI_PATTERN_RNHR_MESSAGE = "ANTI-PATTERN RNHR : just returns null instead of handling or re-throwing the exception, swallows the exception, losing the information forever";
-	private static final String ANTI_PATTERN_MLLM_MESSAGE = "ANTI-PATTERN MLLM : Using multi-line log messages causes problems when multiple threads are running in parallel, two log messages may end up spaced-out multiple lines apart in the log file,  group together all log messages, regardless of the level";
-	private static final String ANTI_PATTERN_PSRN_MESSAGE = "ANTI-PATTERN PSRN : Print stack-trace and return null is wrong, instead of returning null, throw the exception, and let the caller deal with it";
-	private static final String ANTI_PATTERN_LGRN_MESSAGE = "ANTI-PATTERN LGRN : Log and return null is wrong, instead of returning null, throw the exception, and let the caller deal with it";
-	private static final String ANTI_PATTERN_CTGE_MESSAGE = "ANTI-PATTERN CTGE : catching generic Exception, catch the specific exception that can be thrown";
-	private static final String ANTI_PATTERN_LGTE_MESSAGE = "ANTI-PATTERN LGTE : logging and throwing Exception, choose one otherwise it results in multiple log messages (multiple-entries, duplication)";
-	private static final String ANTI_PATTERN_PSTE_MESSAGE = "ANTI-PATTERN PSTE : printing stack-trace and throwing Exception, choose one otherwise it results in multiple log messages (multiple-entries, duplication)";
 	public int catchall = 0;
 	public int catchnpe = 0;
 	public int returnnull = 0;
@@ -68,7 +53,15 @@ public class CatchClauseVisitor extends ASTVisitor {
 	public PrintWriter writer = null;
 	public int linenumber = 1;
 	private ICompilationUnit unit;
+	private IProject project;
 	
+	/**
+	 * @param project
+	 */
+	public CatchClauseVisitor(IProject project) {
+		this.project = project;
+	}
+
 	public void setLinenumber(int linenumber){
 		this.linenumber = linenumber;
 	}
@@ -169,15 +162,17 @@ public class CatchClauseVisitor extends ASTVisitor {
 			//ParichayanaActivator.logInfo("****** CONTAINS PRINT STACK TRACE ******");
 			printstacktraceflag = true;
 		}
-		if(throwflag && printstacktraceflag){
+		String type = ParichayanaActivator.getPreference(Constants.TEST_PSTE, project);
+		if(throwflag && printstacktraceflag && !JavaCore.IGNORE.equals(type)){
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 			ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-			ParichayanaActivator.logInfo(ANTI_PATTERN_PSTE_MESSAGE);
+			ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_PSTE_MESSAGE);
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			//writer.println("_________________________________________________________________________________");
 	    	try {
-				createMarker(unit, ANTI_PATTERN_PSTE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.PSTE_MARKER_ID, node.getStartPosition(), node.getLength());
+	    		int severity = getSeverity(type);
+				createMarker(unit, Constants.ANTI_PATTERN_PSTE_MESSAGE, severity, Constants.PSTE_MARKER_ID, node.getStartPosition(), node.getLength());
 			} catch (CoreException e) {
 				ParichayanaActivator.log(e);
 			}
@@ -185,7 +180,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 			linenumber++;
 	    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 			linenumber++;
-	    	writer.println(linenumber + " " + ANTI_PATTERN_PSTE_MESSAGE);
+	    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_PSTE_MESSAGE);
 			linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 			numthrowprintst++;
@@ -206,14 +201,16 @@ public class CatchClauseVisitor extends ASTVisitor {
 			logflag = true;
 		
 		}
-		if(throwflag && logflag){
+		type = ParichayanaActivator.getPreference(Constants.TEST_LGTE, project);
+		if(throwflag && logflag && !JavaCore.IGNORE.equals(type)){
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 			ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-			ParichayanaActivator.logInfo(ANTI_PATTERN_LGTE_MESSAGE);
+			ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_LGTE_MESSAGE);
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			try {
-				createMarker(unit, ANTI_PATTERN_LGTE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.LGTE_MARKER_ID, node.getStartPosition(), node.getLength());
+				int severity = getSeverity(type);
+				createMarker(unit, Constants.ANTI_PATTERN_LGTE_MESSAGE, severity, Constants.LGTE_MARKER_ID, node.getStartPosition(), node.getLength());
 			} catch (CoreException e) {
 				ParichayanaActivator.log(e);
 			}
@@ -222,7 +219,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 			linenumber++;
 	    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 			linenumber++;
-	    	writer.println(linenumber + " " + ANTI_PATTERN_LGTE_MESSAGE);
+	    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_LGTE_MESSAGE);
 			linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 			numthrowlog++;
@@ -231,7 +228,8 @@ public class CatchClauseVisitor extends ASTVisitor {
 	    /////////////////LOG FATAL/////////////////////////////////////
 		List<Statement> lis = node.getBody().statements();
 		int lssize = lis.size();		
-		if(lssize==1){
+		type = ParichayanaActivator.getPreference(Constants.TEST_LGFT, project);
+		if(lssize==1 && !JavaCore.IGNORE.equals(type)){
 			if( (body.contains(new StringBuffer("log.fatal"))) ||
 				(body.contains(new StringBuffer("logger.fatal"))) ) {
 					ParichayanaActivator.logInfo("LOG FATAL");
@@ -239,10 +237,10 @@ public class CatchClauseVisitor extends ASTVisitor {
 					ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 					ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-			    	ParichayanaActivator.logInfo(ANTI_PATTERN_LGFT_MESSAGE);
+			    	ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_LGFT_MESSAGE);
 			    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			    	try {
-						createMarker(unit, ANTI_PATTERN_LGFT_MESSAGE, IMarker.SEVERITY_WARNING, Constants.LGFT_MARKER_ID, node.getStartPosition(), node.getLength());
+						createMarker(unit, Constants.ANTI_PATTERN_LGFT_MESSAGE, IMarker.SEVERITY_WARNING, Constants.LGFT_MARKER_ID, node.getStartPosition(), node.getLength());
 					} catch (CoreException ex) {
 						ParichayanaActivator.log(ex);
 					}
@@ -251,7 +249,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 					linenumber++;
 			    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 			    	linenumber++;
-			    	writer.println(linenumber + " " + ANTI_PATTERN_LGFT_MESSAGE);
+			    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_LGFT_MESSAGE);
 			    	linenumber++;
 			    	writer.println("_________________________________________________________________________________");
 			}
@@ -262,67 +260,75 @@ public class CatchClauseVisitor extends ASTVisitor {
 		//////////////////////DESTRUCTIVE WRAPPING/////////////////////
 		lis = node.getBody().statements();
 		lssize = lis.size();
-		for(int i=0;i<lssize;i++){
-			Statement s = (Statement)lis.get(i);
-			String content = s.toString();
-			if( content.contains("throw") && content.contains("new") && content.contains("getMessage") ){
-				SingleVariableDeclaration svd = node.getException();
-				//ParichayanaActivator.logInfo("SVD : " + svd.getName());
-				if(!(content.contains(","+svd.getName()+")"))){
-					//ParichayanaActivator.logInfo("NOT-PATTERN" + ","+svd.getName()+")");
-					//ParichayanaActivator.logInfo("****** CONTAINS THROW GETMESSAGE ******");
-					ParichayanaActivator.logInfo("_________________________________________________________________________________");
-			    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
-					ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-			    	ParichayanaActivator.logInfo(ANTI_PATTERN_WEPG_MESSAGE);
-			    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
-			    	try {
-						createMarker(unit, ANTI_PATTERN_WEPG_MESSAGE, IMarker.SEVERITY_WARNING, Constants.WEPG_MARKER_ID, node.getStartPosition(), node.getLength());
-					} catch (CoreException ex) {
-						ParichayanaActivator.log(ex);
-					}
+		type = ParichayanaActivator.getPreference(Constants.TEST_WEPG, project);
+		if (!JavaCore.IGNORE.equals(type)) {
+			for(int i=0;i<lssize;i++){
+				Statement s = (Statement)lis.get(i);
+				String content = s.toString();
+				if( content.contains("throw") && content.contains("new") && content.contains("getMessage") ){
+					SingleVariableDeclaration svd = node.getException();
+					//ParichayanaActivator.logInfo("SVD : " + svd.getName());
+					if(!(content.contains(","+svd.getName()+")"))){
+						//ParichayanaActivator.logInfo("NOT-PATTERN" + ","+svd.getName()+")");
+						//ParichayanaActivator.logInfo("****** CONTAINS THROW GETMESSAGE ******");
+						ParichayanaActivator.logInfo("_________________________________________________________________________________");
+						ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
+						ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
+						ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_WEPG_MESSAGE);
+						ParichayanaActivator.logInfo("_________________________________________________________________________________");
+						try {
+							int severity = getSeverity(type);
+							createMarker(unit, Constants.ANTI_PATTERN_WEPG_MESSAGE, severity, Constants.WEPG_MARKER_ID, node.getStartPosition(), node.getLength());
+						} catch (CoreException ex) {
+							ParichayanaActivator.log(ex);
+						}
 			    	//writer.println("_________________________________________________________________________________");
 			    	writer.println(linenumber + " FILE NAME : " + getName(unit) + "\n");
 					linenumber++;
 			    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 			    	linenumber++;
-			    	writer.println(linenumber + " " + ANTI_PATTERN_WEPG_MESSAGE);
+			    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_WEPG_MESSAGE);
 			    	linenumber++;
 			    	writer.println("_________________________________________________________________________________");
 			    	numdestwrap++;
 				}
 			}
 		}
+		}
 		///////////////////////////////////////////////////////////////
 		
 		//////////////////RELYING ON GETCLAUSE////////////////////////////
 		List<Statement> lists = node.getBody().statements();
 		int lssizee = lists.size();
-		for(int i=0;i<lssizee;i++){
-			if( (lists.get(i).toString().trim().contains("if")) &&
-				(lists.get(i).toString().trim().contains("getCause")) &&
-				(lists.get(i).toString().trim().contains("instanceof")) )
-					 {
-				//ParichayanaActivator.logInfo("****** CONTAINS IF GETCAUSE INSTANCE ******");
-				ParichayanaActivator.logInfo("_________________________________________________________________________________");
-		    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
-				ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-				ParichayanaActivator.logInfo(ANTI_PATTERN_RRGC_MESSAGE);
-				ParichayanaActivator.logInfo("_________________________________________________________________________________");
-				try {
-					createMarker(unit, ANTI_PATTERN_RRGC_MESSAGE, IMarker.SEVERITY_WARNING, Constants.RRGC_MARKER_ID, node.getStartPosition(), node.getLength());
-				} catch (CoreException ex) {
-					ParichayanaActivator.log(ex);
-				}
-				//writer.println("_________________________________________________________________________________");
-		    	writer.println(linenumber + " FILE NAME : " + getName(unit) + "\n");
-				linenumber++;
-		    	writer.println(linenumber + " CATCH CLAUSE : " + node);
-				linenumber++;
-		    	writer.println(linenumber + " " + ANTI_PATTERN_RRGC_MESSAGE);
-				linenumber++;
-		    	writer.println("_________________________________________________________________________________");
-				numreplyingcause++;
+		type = ParichayanaActivator.getPreference(Constants.TEST_RRGC, project);
+		if (!JavaCore.IGNORE.equals(type)) {
+			for(int i=0;i<lssizee;i++){
+				if( (lists.get(i).toString().trim().contains("if")) &&
+						(lists.get(i).toString().trim().contains("getCause")) &&
+						(lists.get(i).toString().trim().contains("instanceof")) )
+					 	{
+					//ParichayanaActivator.logInfo("****** CONTAINS IF GETCAUSE INSTANCE ******");
+					ParichayanaActivator.logInfo("_________________________________________________________________________________");
+					ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
+					ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
+					ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_RRGC_MESSAGE);
+					ParichayanaActivator.logInfo("_________________________________________________________________________________");
+					try {
+						int severity = getSeverity(type);
+						createMarker(unit, Constants.ANTI_PATTERN_RRGC_MESSAGE, severity, Constants.RRGC_MARKER_ID, node.getStartPosition(), node.getLength());
+					} catch (CoreException ex) {
+						ParichayanaActivator.log(ex);
+					}
+					//writer.println("_________________________________________________________________________________");
+					writer.println(linenumber + " FILE NAME : " + getName(unit) + "\n");
+					linenumber++;
+					writer.println(linenumber + " CATCH CLAUSE : " + node);
+					linenumber++;
+					writer.println(linenumber + " " + Constants.ANTI_PATTERN_RRGC_MESSAGE);
+					linenumber++;
+					writer.println("_________________________________________________________________________________");
+					numreplyingcause++;
+					}
 			}
 		}
 		/////////////////////////////////////////////////////////////
@@ -331,16 +337,18 @@ public class CatchClauseVisitor extends ASTVisitor {
 		//////////////////CATCH AND IGNORE////////////////////////////
 		List<Statement> ls = node.getBody().statements();
 		lssize = ls.size();
-		if(lssize==1){
+		type = ParichayanaActivator.getPreference(Constants.TEST_RNHR, project);
+		if(lssize==1 && !JavaCore.IGNORE.equals(type)){
 			if((body.trim().contains("return null;")) || (body.trim().contains("return (null);"))) {
 		    	//ParichayanaActivator.logInfo("****** CONTAINS SINGLE RETURN NULL ******");
 				ParichayanaActivator.logInfo("_________________________________________________________________________________");
 		    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 		    	ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-		    	ParichayanaActivator.logInfo(ANTI_PATTERN_RNHR_MESSAGE);
+		    	ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_RNHR_MESSAGE);
 		    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 		    	try {
-					createMarker(unit, ANTI_PATTERN_RNHR_MESSAGE, IMarker.SEVERITY_WARNING, Constants.RNHR_MARKER_ID, node.getStartPosition(), node.getLength());
+		    		int severity = getSeverity(type);
+					createMarker(unit, Constants.ANTI_PATTERN_RNHR_MESSAGE, severity, Constants.RNHR_MARKER_ID, node.getStartPosition(), node.getLength());
 				} catch (CoreException e) {
 					ParichayanaActivator.log(e);
 				}
@@ -349,7 +357,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 				linenumber++;
 		    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 		    	linenumber++;
-		    	writer.println(linenumber + " " + ANTI_PATTERN_RNHR_MESSAGE);
+		    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_RNHR_MESSAGE);
 		    	linenumber++;
 		    	writer.println("_________________________________________________________________________________");
 		    	numcatchignore++;
@@ -378,15 +386,17 @@ public class CatchClauseVisitor extends ASTVisitor {
 				logcounter++;
 			}
 		}
-		if(logcounter>1){
+		type = ParichayanaActivator.getPreference(Constants.TEST_MLLM, project);
+		if(logcounter>1 && !JavaCore.IGNORE.equals(type)){
 			nummultilinelog++;
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 			ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-			ParichayanaActivator.logInfo(ANTI_PATTERN_MLLM_MESSAGE);
+			ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_MLLM_MESSAGE);
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			try {
-				createMarker(unit, ANTI_PATTERN_MLLM_MESSAGE, IMarker.SEVERITY_WARNING, Constants.MLLM_MARKER_ID, node.getStartPosition(), node.getLength());
+				int severity = getSeverity(type);
+				createMarker(unit, Constants.ANTI_PATTERN_MLLM_MESSAGE, severity, Constants.MLLM_MARKER_ID, node.getStartPosition(), node.getLength());
 			} catch (CoreException e) {
 				ParichayanaActivator.log(e);
 			}
@@ -395,7 +405,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 			linenumber++;
 	    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 			linenumber++;
-	    	writer.println(linenumber + " " + ANTI_PATTERN_MLLM_MESSAGE);
+	    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_MLLM_MESSAGE);
 			linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 		}
@@ -415,16 +425,18 @@ public class CatchClauseVisitor extends ASTVisitor {
 					emptyStatement = false;
 				}
 			}
-			if(emptyStatement){
+			type = ParichayanaActivator.getPreference(Constants.TEST_INEE, project);
+			if(emptyStatement && !JavaCore.IGNORE.equals(type)){
 				numInterruptedException++;
 				//ParichayanaActivator.logInfo("INTERRUPTED EXCEPTION : " + node);
 				ParichayanaActivator.logInfo("_________________________________________________________________________________");
 		    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 		    	ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-		    	ParichayanaActivator.logInfo(ANTI_PATTERN_INEE_MESSAGE);
+		    	ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_INEE_MESSAGE);
 		    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 		    	try {
-					createMarker(unit, ANTI_PATTERN_INEE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.INEE_MARKER_ID, node.getStartPosition(), node.getLength());
+		    		int severity = getSeverity(type);
+					createMarker(unit, Constants.ANTI_PATTERN_INEE_MESSAGE, severity, Constants.INEE_MARKER_ID, node.getStartPosition(), node.getLength());
 				} catch (CoreException ex) {
 					ParichayanaActivator.log(ex);
 				}
@@ -433,7 +445,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 		    	linenumber++;
 		    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 		    	linenumber++;
-		    	writer.println(linenumber + " " + ANTI_PATTERN_INEE_MESSAGE);
+		    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_INEE_MESSAGE);
 		    	linenumber++;
 		    	writer.println("_________________________________________________________________________________");
 		    
@@ -442,7 +454,9 @@ public class CatchClauseVisitor extends ASTVisitor {
 		
 	    ///////////////////CATCH ALL///////////////////////////////////
 	    nodeType = node.getException().getType().toString();
-	    if( (nodeType.equalsIgnoreCase("Exception")) || (nodeType.equalsIgnoreCase("Throwable")) ){
+	    type = ParichayanaActivator.getPreference(Constants.TEST_CTGE, project);
+	    boolean ignore = JavaCore.IGNORE.equals(type);
+	    if( !ignore && ( (nodeType.equalsIgnoreCase("Exception")) || (nodeType.equalsIgnoreCase("Throwable")) ) ){
 	    	List<Statement> lstate = node.getBody().statements();
             int lstatesize = lstate.size();
 			Statement laststatement = (Statement)lstate.get(lstatesize-1);
@@ -451,10 +465,11 @@ public class CatchClauseVisitor extends ASTVisitor {
 		    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 		    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 		    	ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-		    	ParichayanaActivator.logInfo(ANTI_PATTERN_CTGE_MESSAGE);
+		    	ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_CTGE_MESSAGE);
 		    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 		    	try {
-					createMarker(unit, ANTI_PATTERN_CTGE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.CTGE_MARKER_ID, node.getStartPosition(), node.getLength());
+		    		int severity = getSeverity(type);
+					createMarker(unit, Constants.ANTI_PATTERN_CTGE_MESSAGE, severity, Constants.CTGE_MARKER_ID, node.getStartPosition(), node.getLength());
 				} catch (CoreException e) {
 					ParichayanaActivator.log(e);
 				}
@@ -463,7 +478,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 		    	linenumber++;
 		    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 		    	linenumber++;
-		    	writer.println(linenumber + " " + ANTI_PATTERN_CTGE_MESSAGE);
+		    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_CTGE_MESSAGE);
 		    	linenumber++;
 		    	writer.println("_________________________________________________________________________________");
 			}
@@ -472,15 +487,17 @@ public class CatchClauseVisitor extends ASTVisitor {
 	    
 	    ///////////////////CATCH NULL POINTER EXCEPTION///////////////////////////////////
 	    nodeType = node.getException().getType().toString();
+	    type = ParichayanaActivator.getPreference(Constants.TEST_CNPE, project);
 	    if( (nodeType.equalsIgnoreCase("NullPointerException"))) {
 	    	catchnpe++;
 	    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 	    	ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-	    	ParichayanaActivator.logInfo(ANTI_PATTERN_CNPE_MESSAGE);
+	    	ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_CNPE_MESSAGE);
 	    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	try {
-				createMarker(unit, ANTI_PATTERN_CNPE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.CNPE_MARKER_ID, node.getStartPosition(), node.getLength());
+	    		int severity = getSeverity(type);
+				createMarker(unit, Constants.ANTI_PATTERN_CNPE_MESSAGE, severity, Constants.CNPE_MARKER_ID, node.getStartPosition(), node.getLength());
 			} catch (CoreException ex) {
 				ParichayanaActivator.log(ex);
 			}
@@ -489,7 +506,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 	    	linenumber++;
 	    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 	    	linenumber++;
-	    	writer.println(linenumber + " " + ANTI_PATTERN_CNPE_MESSAGE);
+	    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_CNPE_MESSAGE);
 	    	linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 	    }
@@ -503,15 +520,17 @@ public class CatchClauseVisitor extends ASTVisitor {
 	    	returnnullflag = true;
 	    	//ParichayanaActivator.logInfo("****** CONTAINS RETURN NULL ******");
 	    }
-	    if(returnnullflag && logflag){
+	    type = ParichayanaActivator.getPreference(Constants.TEST_LGRN, project);
+	    if(returnnullflag && logflag && !JavaCore.IGNORE.equals(type)){
 	    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 	    	ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-			ParichayanaActivator.logInfo(ANTI_PATTERN_LGRN_MESSAGE);
+			ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_LGRN_MESSAGE);
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			//writer.println("_________________________________________________________________________________");
 			try {
-				createMarker(unit, ANTI_PATTERN_LGRN_MESSAGE, IMarker.SEVERITY_WARNING, Constants.LGRN_MARKER_ID, node.getStartPosition(), node.getLength());
+				int severity = getSeverity(type);
+				createMarker(unit, Constants.ANTI_PATTERN_LGRN_MESSAGE, severity, Constants.LGRN_MARKER_ID, node.getStartPosition(), node.getLength());
 			} catch (CoreException e) {
 				ParichayanaActivator.log(e);
 			}
@@ -519,19 +538,21 @@ public class CatchClauseVisitor extends ASTVisitor {
 	    	linenumber++;
 	    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 			linenumber++;
-	    	writer.println(linenumber + ANTI_PATTERN_LGRN_MESSAGE);
+	    	writer.println(linenumber + Constants.ANTI_PATTERN_LGRN_MESSAGE);
 			linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 			numlogreturnnul++;
 		}
-	    if(returnnullflag && printstacktraceflag){
+	    type = ParichayanaActivator.getPreference(Constants.TEST_PSRN, project);
+	    if(returnnullflag && printstacktraceflag && !JavaCore.IGNORE.equals(type)){
 	    	ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 	    	ParichayanaActivator.logInfo("CATCH CLAUSE : " + node);
-			ParichayanaActivator.logInfo(ANTI_PATTERN_PSRN_MESSAGE);
+			ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_PSRN_MESSAGE);
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			try {
-				createMarker(unit, ANTI_PATTERN_PSRN_MESSAGE, IMarker.SEVERITY_WARNING, Constants.PSRN_MARKER_ID, node.getStartPosition(), node.getLength());
+				int severity = getSeverity(type);
+				createMarker(unit, Constants.ANTI_PATTERN_PSRN_MESSAGE, severity, Constants.PSRN_MARKER_ID, node.getStartPosition(), node.getLength());
 			} catch (CoreException e) {
 				ParichayanaActivator.log(e);
 			}
@@ -540,7 +561,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 	    	linenumber++;
 	    	writer.println(linenumber + " CATCH CLAUSE : " + node);
 			linenumber++;
-	    	writer.println(linenumber + " " + ANTI_PATTERN_PSRN_MESSAGE);
+	    	writer.println(linenumber + " " + Constants.ANTI_PATTERN_PSRN_MESSAGE);
 			linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 			numprintstackreturnnull++;
@@ -549,6 +570,21 @@ public class CatchClauseVisitor extends ASTVisitor {
 		return true;
 	}
 	
+	/**
+	 * @param type
+	 * @return
+	 */
+	private int getSeverity(String type) {
+		// TODO Auto-generated method stub
+		if (JavaCore.ERROR.equals(type)) {
+			return IMarker.SEVERITY_ERROR;
+		};
+		if (JavaCore.WARNING.equals(type)) {
+			return IMarker.SEVERITY_WARNING;
+		};
+		return IMarker.SEVERITY_INFO;
+	}
+
 	/**
 	 * @param unit2
 	 * @return
@@ -576,10 +612,10 @@ public class CatchClauseVisitor extends ASTVisitor {
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 	    	ParichayanaActivator.logInfo("FILE NAME : " + getName(unit) + "\n");
 	    	ParichayanaActivator.logInfo("THROW CLAUSE : " + node);
-			ParichayanaActivator.logInfo(ANTI_PATTERN_TNPE_MESSAGE);
+			ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_TNPE_MESSAGE);
 			ParichayanaActivator.logInfo("_________________________________________________________________________________");
 			try {
-				createMarker(unit, ANTI_PATTERN_TNPE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.TNPE_MARKER_ID, node.getStartPosition(), node.getLength());
+				createMarker(unit, Constants.ANTI_PATTERN_TNPE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.TNPE_MARKER_ID, node.getStartPosition(), node.getLength());
 			} catch (CoreException ex) {
 				ParichayanaActivator.log(ex);
 			}
@@ -588,7 +624,7 @@ public class CatchClauseVisitor extends ASTVisitor {
 	    	linenumber++;
 	    	writer.println(linenumber + " THROW CLAUSE : " + node);
 			linenumber++;
-	    	writer.println(linenumber + ANTI_PATTERN_TNPE_MESSAGE);
+	    	writer.println(linenumber + Constants.ANTI_PATTERN_TNPE_MESSAGE);
 			linenumber++;
 	    	writer.println("_________________________________________________________________________________");
 			numtnpe++;
@@ -616,17 +652,17 @@ public class CatchClauseVisitor extends ASTVisitor {
 		    	int ind2 = node.toString().indexOf(node.getName().toString());
 				ParichayanaActivator.logInfo("METHOD NAME : " + node.toString().substring(ind2, ind));
 				ParichayanaActivator.logInfo("\n");
-				ParichayanaActivator.logInfo(ANTI_PATTERN_THGE_MESSAGE);
+				ParichayanaActivator.logInfo(Constants.ANTI_PATTERN_THGE_MESSAGE);
 				ParichayanaActivator.logInfo("_________________________________________________________________________________");
 				writer.println(linenumber + " METHOD NAME : " + node.toString().substring(ind2, ind));
 				try {
-					createMarker(unit, ANTI_PATTERN_THGE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.THGE_MARKER_ID, node.getStartPosition(), node.getLength());
+					createMarker(unit, Constants.ANTI_PATTERN_THGE_MESSAGE, IMarker.SEVERITY_WARNING, Constants.THGE_MARKER_ID, node.getStartPosition(), node.getLength());
 				} catch (CoreException ex) {
 					ParichayanaActivator.log(ex);
 				}
 				linenumber++;
 				writer.println();
-				writer.println(linenumber + " " + ANTI_PATTERN_THGE_MESSAGE);
+				writer.println(linenumber + " " + Constants.ANTI_PATTERN_THGE_MESSAGE);
 				linenumber++;
 				writer.println("_________________________________________________________________________________");
 				numthrowsexception++;

@@ -12,10 +12,16 @@ package in.software.analytics.parichayana.core;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -83,5 +89,40 @@ public class ParichayanaActivator extends AbstractUIPlugin {
 		File file = new File(projectFile, "parichyana.txt");
 		return file;
 	}
+	
+	public static String getPreference(String name) {
+		return getPreference(name, null, null);
+	}
+	
+	public static String getPreference(String name, String defaultValue) {
+		return getPreference(name, defaultValue, null);
+	}
+	
+	public static String getPreference(String name, IProject project) {
+		return getPreference(name, null, project);
+	}
+	
+	public static String getPreference(String name, String defaultValue, IProject project) {
+		IEclipsePreferences[] preferencesLookup;
+		if (project != null) {
+			preferencesLookup = new IEclipsePreferences[] {
+					new ProjectScope(project).getNode(PLUGIN_ID),
+					InstanceScope.INSTANCE.getNode(PLUGIN_ID),
+					DefaultScope.INSTANCE.getNode(PLUGIN_ID)
+			};
+		} else {
+			preferencesLookup = new IEclipsePreferences[] {
+					InstanceScope.INSTANCE.getNode(PLUGIN_ID),
+					DefaultScope.INSTANCE.getNode(PLUGIN_ID)
+			};
+		}
+		IPreferencesService service = Platform.getPreferencesService();
+		String value = service.get(name, defaultValue, preferencesLookup);
+		return value;
+	}
 
+	public static boolean isParichayanaEnabled(IProject project) {
+		String preference = getPreference(Constants.ENABLE_PARICHAYANA, project);
+		return Boolean.TRUE.toString().equals(preference);
+	}
 }
