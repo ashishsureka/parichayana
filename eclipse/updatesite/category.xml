@@ -7,9 +7,9 @@
       <category name="Parichayana"/>
    </feature>
    <feature url="features/in.software.analytics.parichayana.feature.source_0.0.0.jar" id="in.software.analytics.parichayana.feature.source" version="0.0.0">
-      <category name="Parichayana Sources"/>
+      <category name="Parichayana"/>
    </feature>
-   <category-def name="Parichayana Feature" label="Parichayana ">
+   <category-def name="Parichayana" label="Parichayana ">
       <description>
          Parichayana Feature
       </description>
