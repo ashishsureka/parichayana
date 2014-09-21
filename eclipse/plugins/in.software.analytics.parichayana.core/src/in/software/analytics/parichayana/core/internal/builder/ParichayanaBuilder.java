@@ -16,8 +16,12 @@ import in.software.analytics.parichayana.core.internal.nature.ParichayanaNature;
 import in.software.analytics.parichayana.engine.CatchAntiPatterns;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -162,8 +166,56 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 	 * @param monitor 
 	 */
 	private void build(List<ICompilationUnit> units, IProgressMonitor monitor) {
+		Iterator<ICompilationUnit> iter = units.iterator();
+		while (iter.hasNext()) {
+			ICompilationUnit unit = iter.next();
+			String name = getFullyQualifiedName(unit);
+			String include = ParichayanaActivator.getPreference(Constants.INCLUDE_EXPRESSION, project);
+			if (!match(include, name)) {
+				iter.remove();
+				continue;
+			}
+			String exclude = ParichayanaActivator.getPreference(Constants.EXCLUDE_EXPRESSION, project);
+			if (match(exclude, name)) {
+				iter.remove();
+			}
+		}
 		monitor.beginTask("Parichayana builder", units.size());
 		new CatchAntiPatterns(units, project, monitor);
+	}
+
+	/**
+	 * @param unit
+	 * @return
+	 */
+	private String getFullyQualifiedName(ICompilationUnit unit) {
+		String name = unit.getElementName();
+		IJavaElement parent = unit.getParent();
+		if (parent instanceof IPackageFragment) {
+			String n = parent.getElementName();
+			if (n != null && !n.isEmpty()) {
+				name = n + "." + name;
+			}
+		}
+		if (name.endsWith(".java")) {
+			name = name.substring(0, name.length()-5);
+		}
+		return name;
+	}
+
+	private boolean match( String expression, String name) {
+		if (expression != null && !expression.isEmpty()) {
+			try {
+				Pattern pattern = Pattern.compile(expression);
+				Matcher matcher = pattern.matcher(name);
+				boolean f = matcher.find();
+				return f;
+			} catch (PatternSyntaxException e) {
+				ParichayanaActivator.logWarning(e.getMessage() + ", expession=" + expression);
+				return true;
+			}
+		}
+		return true;
 	}
 
 	/**

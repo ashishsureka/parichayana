@@ -42,7 +42,8 @@ public class ParichayanaPreferencesInitializer extends
 		preferences.put(Constants.TEST_CNPE, JavaCore.WARNING);
 		preferences.put(Constants.TEST_TNPE, JavaCore.WARNING);
 		preferences.put(Constants.TEST_CTGE, JavaCore.WARNING);
-		
+		preferences.put(Constants.INCLUDE_EXPRESSION, "");
+		preferences.put(Constants.EXCLUDE_EXPRESSION, "");
 	}
 
 }

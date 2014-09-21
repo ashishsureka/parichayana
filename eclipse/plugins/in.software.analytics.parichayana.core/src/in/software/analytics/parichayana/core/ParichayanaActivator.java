@@ -79,6 +79,10 @@ public class ParichayanaActivator extends AbstractUIPlugin {
 			plugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
 		}
 	}
+	
+	public static void logWarning(String message) {
+		plugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+	}
 
 	public static File getDestinationFile(String projectName) {
 		Bundle bundle = Platform.getBundle(PLUGIN_ID);

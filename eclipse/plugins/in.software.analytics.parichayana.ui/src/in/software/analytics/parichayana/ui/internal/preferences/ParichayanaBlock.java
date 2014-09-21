@@ -10,12 +10,16 @@
  *******************************************************************************/
 package in.software.analytics.parichayana.ui.internal.preferences;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import in.software.analytics.parichayana.core.Constants;
 import in.software.analytics.parichayana.core.ParichayanaActivator;
 import in.software.analytics.parichayana.ui.ParichayanaUIActivator;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.ui.dialogs.StatusInfo;
 import org.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock;
 import org.eclipse.jdt.internal.ui.preferences.ScrolledPageContent;
 import org.eclipse.jdt.internal.ui.wizards.IStatusChangeListener;
@@ -52,6 +56,9 @@ public class ParichayanaBlock extends OptionsConfigurationBlock {
 	private static final Key TEST_CNPE = getKey(ParichayanaActivator.PLUGIN_ID, Constants.TEST_CNPE);
 	private static final Key TEST_TNPE = getKey(ParichayanaActivator.PLUGIN_ID, Constants.TEST_TNPE);
 	
+	private static final Key INCLUDE_EXPRESSION = getKey(ParichayanaActivator.PLUGIN_ID, Constants.INCLUDE_EXPRESSION);
+	private static final Key EXCLUDE_EXPRESSION = getKey(ParichayanaActivator.PLUGIN_ID, Constants.EXCLUDE_EXPRESSION);
+	
 	private static final Key ENABLE_PARICHAYANA = getKey(ParichayanaActivator.PLUGIN_ID, Constants.ENABLE_PARICHAYANA);
 	
 	private static final String ERROR= JavaCore.ERROR;
@@ -74,6 +81,8 @@ public class ParichayanaBlock extends OptionsConfigurationBlock {
 
 	public static Key[] getKeys() {
 		return new Key[] {
+				 INCLUDE_EXPRESSION,
+				 EXCLUDE_EXPRESSION,
 				 TEST_PSTE,
 				 TEST_LGTE,
 				 TEST_CTGE,
@@ -179,6 +188,13 @@ public class ParichayanaBlock extends OptionsConfigurationBlock {
 		
 		inner= createInnerComposite(excomposite, nColumns, composite.getFont());
 		
+		label = "Include expression";
+		fFilteredPrefTree.addTextField(inner, label, INCLUDE_EXPRESSION, defaultIndent, 150, section);
+		
+		label = "Exclude expression";
+		fFilteredPrefTree.addTextField(inner, label, EXCLUDE_EXPRESSION, defaultIndent, 150, section);
+		
+		
 		label= "PSTE:printing stack-trace and throwing Exception";
 		fFilteredPrefTree.addComboBox(inner, label, TEST_PSTE, errorWarningIgnore, errorWarningIgnoreLabels, defaultIndent, section);
 		
@@ -241,7 +257,28 @@ public class ParichayanaBlock extends OptionsConfigurationBlock {
 	 */
 	@Override
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
-		// FIXME
+		fContext.statusChanged(new StatusInfo());
+		validateExpression(changedKey, newValue, INCLUDE_EXPRESSION, "Invalid include expression");
+		validateExpression(changedKey, newValue, EXCLUDE_EXPRESSION, "Invalid exclude expression");
+	}
+
+	/**
+	 * @param changedKey
+	 * @param newValue
+	 * @param Expression 
+	 */
+	private void validateExpression(Key changedKey, String newValue, Key expression, String message) {
+		if (changedKey == expression) {
+			if (newValue != null && !newValue.isEmpty()) {
+				try {
+					Pattern.compile(newValue);
+				} catch (PatternSyntaxException e) {
+					final StatusInfo status= new StatusInfo();
+					status.setError(message);
+					fContext.statusChanged(status);
+				}
+			}
+		}
 	}
 
 	private static boolean lessSevere(String errorWarningIgnore, String errorWarningIgnore2) {
@@ -291,6 +328,8 @@ public class ParichayanaBlock extends OptionsConfigurationBlock {
 		setComboEnabled(TEST_LGFT, enabled);
 		setComboEnabled(TEST_CNPE, enabled);
 		setComboEnabled(TEST_TNPE, enabled);
+		setTextFieldEnabled(INCLUDE_EXPRESSION, enabled);
+		setTextFieldEnabled(EXCLUDE_EXPRESSION, enabled);
 	}
 
 }

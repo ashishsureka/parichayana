@@ -1,4 +1,3 @@
-package in.software.analytics.parichayana.engine;
 /**
 * Mining Source Code for Automatically Discovering Exception Management Anti-Patterns and Code Smell 
 *
@@ -6,6 +5,8 @@ package in.software.analytics.parichayana.engine;
 * @version 1.0
 * @since   2014-06-30 
 */
+package in.software.analytics.parichayana.engine;
+
 import in.software.analytics.parichayana.core.ParichayanaActivator;
 
 import java.io.File;
@@ -13,7 +14,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;

@@ -72,6 +72,9 @@ public interface Constants {
 	public static final String TEST_CNPE = ParichayanaActivator.PLUGIN_ID + ".testCNPE";
 	public static final String TEST_TNPE = ParichayanaActivator.PLUGIN_ID + ".testTNPE";
 	
+	public static final String INCLUDE_EXPRESSION = ParichayanaActivator.PLUGIN_ID + ".includeExpression";
+	public static final String EXCLUDE_EXPRESSION = ParichayanaActivator.PLUGIN_ID + ".excludeExpression";
+	
 	public static final String ENABLE_PARICHAYANA = "enableParichayana";
 	
 }

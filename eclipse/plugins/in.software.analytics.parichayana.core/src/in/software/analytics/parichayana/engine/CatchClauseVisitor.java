@@ -1,4 +1,3 @@
-package in.software.analytics.parichayana.engine;
 /**
 * Mining Source Code for Automatically Discovering Exception Management Anti-Patterns and Code Smell 
 *
@@ -6,6 +5,7 @@ package in.software.analytics.parichayana.engine;
 * @version 1.0
 * @since   2014-06-30 
 */
+package in.software.analytics.parichayana.engine;
 
 import in.software.analytics.parichayana.core.Constants;
 import in.software.analytics.parichayana.core.ParichayanaActivator;
