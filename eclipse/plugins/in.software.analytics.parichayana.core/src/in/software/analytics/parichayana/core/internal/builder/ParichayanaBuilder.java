@@ -171,12 +171,12 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 			ICompilationUnit unit = iter.next();
 			String name = getFullyQualifiedName(unit);
 			String include = ParichayanaActivator.getPreference(Constants.INCLUDE_EXPRESSION, project);
-			if (!match(include, name)) {
+			if (!match(include, name, true)) {
 				iter.remove();
 				continue;
 			}
 			String exclude = ParichayanaActivator.getPreference(Constants.EXCLUDE_EXPRESSION, project);
-			if (match(exclude, name)) {
+			if (match(exclude, name, false)) {
 				iter.remove();
 			}
 		}
@@ -203,7 +203,7 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 		return name;
 	}
 
-	private boolean match( String expression, String name) {
+	private boolean match( String expression, String name, boolean defaultValue) {
 		if (expression != null && !expression.isEmpty()) {
 			try {
 				Pattern pattern = Pattern.compile(expression);
@@ -212,10 +212,10 @@ public class ParichayanaBuilder extends IncrementalProjectBuilder {
 				return f;
 			} catch (PatternSyntaxException e) {
 				ParichayanaActivator.logWarning(e.getMessage() + ", expession=" + expression);
-				return true;
+				return defaultValue;
 			}
 		}
-		return true;
+		return defaultValue;
 	}
 
 	/**
